@@ -16,7 +16,6 @@ function failed()
    exit 1
 }
 
-echo 'ensuring docker'
 which docker || failed "docker not in path"
 
 function build() {
@@ -25,7 +24,6 @@ function build() {
 }
 
 function start() {
-    echo 'starting dev shell'
     echo "mapping ${projdir}:${mappath}"
     docker run --network host -it -h ${imagename} \
         -v ${projdir}:${mappath} \
