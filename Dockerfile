@@ -7,10 +7,11 @@
 # docker run -it -h ubdev -p 7770:7770 -v $(pwd):/sanenode -it bryanmacfarlane/sanenode-dev bash
 
 # https://hub.docker.com/_/ubuntu/
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN apt-get update
 
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get install -y --no-install-recommends apt-utils
 
 #-----------------------------------------------------------------------
@@ -25,6 +26,7 @@ RUN apt-get install -y --no-install-recommends \
 	g++ \
 	gcc \
 	git \
+	jq \
 	make \
 	nginx \
 	sudo \
@@ -45,9 +47,6 @@ RUN curl -fsSLO https://storage.googleapis.com/kubernetes-release/release/v$KUBE
 RUN cp kubectl /usr/local/bin
 RUN rm kubectl
 
-# other dev tools (avoiding invalidating base layers)
-RUN apt-get install -y jq
-
 RUN mkdir -p /install
 
 #------------------------------------------------------------------
@@ -59,3 +58,7 @@ RUN mkdir -p ${NODE_PATH}
 ADD ./install/node.sh /install
 RUN bash /install/node.sh Erbium "${NODE_PATH}"
 ENV PATH ${NODE_PATH}/bin:$PATH
+
+RUN curl -fsSLO https://golang.org/dl/go1.16.4.linux-amd64.tar.gz
+RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+ENV PATH /usr/local/go/bin:$PATH
